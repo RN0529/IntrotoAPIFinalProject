@@ -18,12 +18,14 @@ namespace AnimeCardAPI.Controllers
         {
             _context = context;
         }
+        
 
         // GET: api/BoosterBox
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BoosterBox>>> GetBoosterBoxs()
         {
-            return await _context.BoosterBox.ToListAsync();
+            var responseObj = new Response(200, "Good Request: Data retrieved successfuly", _context.BoosterBox.ToListAsync());
+            return Ok(responseObj);
         }
 
 
@@ -32,23 +34,25 @@ namespace AnimeCardAPI.Controllers
         public async Task<ActionResult<BoosterBox>> GetBoosterBox(int id)
         {
             var BoosterBox = await _context.BoosterBox.FindAsync(id);
-
             if (BoosterBox == null)
             {
-                return NotFound();
+                var responseObj = new Response(400,"Bad Request: Data retrieved unsuccessfuly data not found");
+                return NotFound(responseObj);
             }
-
-            return BoosterBox;
+            var responseObj2 = new Response(200, "Good Request: Data retrieved Successfuly", BoosterBox);
+            return Ok(responseObj2);
         }
 
         // PUT: api/BoosterBox/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, BoosterBox BoosterBox)
+        public async Task<IActionResult> PutBoosterBox(int id, BoosterBox BoosterBox)
         {
+
             if (id != BoosterBox.BoxID)
             {
-                return BadRequest();
+                var responseObj = new Response(400, "Data retrieved unsuccessfuly please enter correct ID");
+                return BadRequest(responseObj);
             }
 
             _context.Entry(BoosterBox).State = EntityState.Modified;
@@ -61,7 +65,9 @@ namespace AnimeCardAPI.Controllers
             {
                 if (!BoosterBoxExists(id))
                 {
-                    return NotFound();
+
+                    var responseObj2 = new Response(400, "Bad request: data was not found please enter an existing ID");
+                    return NotFound(responseObj2);
                 }
                 else
                 {
@@ -69,7 +75,8 @@ namespace AnimeCardAPI.Controllers
                 }
             }
 
-            return NoContent();
+            var responseObj3 = new Response(200, "Good request: Data will be updated");
+            return Ok(responseObj3);
         }
 
 
@@ -78,10 +85,12 @@ namespace AnimeCardAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BoosterBox>> PostBoosterBox(BoosterBox BoosterBox)
         {
+            
             _context.BoosterBox.Add(BoosterBox);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBoosterBox", new { id = BoosterBox.BoxID }, BoosterBox);
+            var responseObj = new Response(200, "Good Response: Data will be added", BoosterBox);
+            return CreatedAtAction("GetBoosterBox", new { id = BoosterBox.BoxID }, responseObj);
         }
 
         // DELETE: api/BoosterBox/5
@@ -91,13 +100,14 @@ namespace AnimeCardAPI.Controllers
             var BoosterBox = await _context.BoosterBox.FindAsync(id);
             if (BoosterBox == null)
             {
-                return NotFound();
+                var responseObj = new Response(400, "Bad Response: Data not found please enter an existing id");
+                return NotFound(responseObj);
             }
 
             _context.BoosterBox.Remove(BoosterBox);
             await _context.SaveChangesAsync();
-
-            return NoContent();
+            var responseObj2 = new Response(200, "Good Response: Data will be deleted");
+            return Ok(responseObj2);
         }
 
         private bool BoosterBoxExists(int id)
